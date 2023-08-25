@@ -79,13 +79,14 @@ public struct Utilities {
     /// by accident.
     public static func hashPersonalMessage(_ personalMessage: Data) -> Data? {
         var prefix = "\u{19}Ethereum Signed Message:\n"
-        prefix += String(personalMessage.count)
-        guard let prefixData = prefix.data(using: .ascii) else { return nil }
+        var prefixWithCount = prefix + String(personalMessage.count)
+        guard let prefixData = prefix.data(using: .ascii),
+              let prefixWithCountData = prefixWithCount.data(using: .ascii) else { return nil }
         var data = Data()
         if personalMessage.count >= prefixData.count && prefixData == personalMessage[0 ..< prefixData.count] {
             data.append(personalMessage)
         } else {
-            data.append(prefixData)
+            data.append(prefixWithCountData)
             data.append(personalMessage)
         }
         let hash = data.sha3(.keccak256)
